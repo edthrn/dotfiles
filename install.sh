@@ -1,5 +1,6 @@
 cd ~/
 ln -s dotfiles/git/.gitconfig ~/
+ln -s dotfiles/git/.gitignore_global ~/
 echo ".gitconfig copied!"
 ln -s dotfiles/bash/.bashrc ~/
 echo ".bashrc copied!"

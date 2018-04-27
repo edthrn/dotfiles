@@ -1,5 +1,7 @@
 [user]
 	email = ed@edtheron.me
 	name = Edouard Theron
+[core]
+	excludesfile = ~/.gitignore_global
 [push]
 	default = simple

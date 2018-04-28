@@ -1,5 +1,16 @@
+#!/bin/bash
+
+# Set colors for print
+WARN='\033[0;33m'
+ERROR='\033[0;31m'
+INFO='\033[0;36m'
+SUCCESS='\033[0;32m'
+
+echo "\nInstalling dotfiles..."
 cd ~/
+echo -e "${INFO}Renaming directory..."
 mv dotfiles .dotfiles
+
 ln -s .dotfiles/git/.gitconfig ~/
 ln -s .dotfiles/git/.gitignore_global ~/
 echo ".gitconfig copied!"

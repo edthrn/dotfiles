@@ -1,7 +1,11 @@
 RPROMPT='$(git_prompt_info)'
 
-PROMPT='%{$fg[green]%}%n@%m %{$fg[cyan]%}$(get_pwd)
-%{$fg_bold[yellow]%}→ %{$reset_color%} '
+# prompt turns red if the previous command didn't exit with 0
+local arrow="%(?:%{$fg_bold[yellow]%}➜  :%{$fg_bold[red]%}➜  )"
+# local conda_env="%(%{$CONDA_PROMPT_MODIFIER%})"
+PROMPT='
+%{$fg[green]%}%n@%m %{$fg[cyan]%}$(get_pwd)
+%{$fg_bold[{$COLOR}]%}${arrow}%{$reset_color%}'
 
 # Replace home by ~
 function get_pwd() {

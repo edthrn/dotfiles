@@ -1,5 +1,5 @@
 [user]
-	email = ed@edtheron.me
+	email = edouard@vivadata.org
 	name = Edouard Theron
 [core]
 	excludesfile = ~/.gitignore_global

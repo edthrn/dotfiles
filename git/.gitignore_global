@@ -1,5 +1,7 @@
 *.swp
-
+.idea/*
+.vscode/*
+*.env
 #compiled source #
 ###################
 *.com

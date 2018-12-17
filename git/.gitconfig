@@ -3,5 +3,6 @@
 	name = Edouard Theron
 [core]
 	excludesfile = ~/.gitignore_global
+	attributesfile = ~/.gitattributes_global
 [push]
 	default = simple

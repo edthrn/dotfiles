@@ -8,20 +8,20 @@ SUCCESS='\033[0;32m'
 
 echo "\nInstalling dotfiles..."
 echo -e "${INFO}Renaming directory..."
-mv ~/dotfiles ~/.dotfiles
+mv $HOME/dotfiles $HOME/.dotfiles
 
-ln -s ~/.dotfiles/git/.gitconfig ~/
-ln -s ~/.dotfiles/git/.gitignore_global ~/
+ln -s $HOME/.dotfiles/git/.gitconfig $HOME
+ln -s $HOME/.dotfiles/git/.gitignore_global $HOME
 echo ".gitconfig copied!"
-ln -s ~/.dotfiles/bash/.bashrc ~/
+ln -s $HOME/.dotfiles/bash/.bashrc $HOME
 echo ".bashrc copied!"
-ln -s ~/.dotfiles/vim/.vim ~/
-ln -s ~/.dotfiles/vim/.vimrc ~/
+ln -s $HOME/.dotfiles/vim/.vim $HOME
+ln -s $HOME/.dotfiles/vim/.vimrc $HOME
 echo "Vim conf-files copied!"
-ln -s ~/.dotfiles/tmux/.tmux.conf ~/
+ln -s $HOME/.dotfiles/tmux/.tmux.conf $HOME
 echo ".tmux-conf copied!"
-ln -s ~/.dotfiles/zsh/.zshrc ~/
+ln -s $HOME/.dotfiles/zsh/.zshrc $HOME
 echo ".zshrc copied!"
-ln -s ~/.dotfiles/zsh/edouard-custom.zsh-theme ~/.oh-my-zsh/themes/
-ln -s ~/.dotfiles/zsh/edouard-root.zsh-theme ~/.oh-my-zsh/themes/
+ln -s $HOME/.dotfiles/zsh/edouard-custom.zsh-theme $HOME/.oh-my-zsh/themes/
+ln -s $HOME/.dotfiles/zsh/edouard-root.zsh-theme $HOME/.oh-my-zsh/themes/
 echo "zsh-themes copied!"

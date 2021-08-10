@@ -1,9 +1,18 @@
+*egg-info*/*
+.ipynb_checkpoints/*
 __pycache__/*
+*/.pytest_cache/*
 *.swp
 .idea/*
+*.pyc
 .vscode/*
 *.env
 .netrwhist
+
+# SSL/TLS/certificates
+*.pem
+*.cert
+*.key
 
 #compiled source #
 ###################

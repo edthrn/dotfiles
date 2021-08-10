@@ -1,8 +1,19 @@
 [user]
-	email = edouard@vivadata.org
+	email = ed@edtheron.me
 	name = Edouard Theron
 [core]
 	excludesfile = ~/.gitignore_global
 	attributesfile = ~/.gitattributes_global
 [push]
 	default = simple
+[merge]
+	ff = false
+[alias]
+	  # https://coderwall.com/p/euwpig/a-better-git-log
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	last = log -1 HEAD
+[pager]
+	branch = false
+	tag = false
+[pull]
+	rebase = true

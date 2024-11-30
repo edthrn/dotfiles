@@ -8,6 +8,14 @@ ZSH_THEME="edouard-custom"
 
 plugins=(git python docker django zsh-navigation-tools zsh-completions aws kubectl go)
 
+ZSH_THEME="dracula"
+
+# Don't save in history commands that starts by space
+# https://superuser.com/a/352858
+setopt HIST_IGNORE_SPACE
+
+export PATH="$PATH:/opt/nvim-linux64/bin"
+alias nv='nvim'
 source $ZSH/oh-my-zsh.sh
 alias sbcl='rlwrap sbcl'
 alias vbox='VBoxManage'

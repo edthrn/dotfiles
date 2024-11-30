@@ -4,6 +4,8 @@
 [core]
 	excludesfile = ~/.gitignore_global
 	attributesfile = ~/.gitattributes_global
+	autocrlf = input
+	editor = vim
 [push]
 	default = simple
 [merge]
@@ -17,3 +19,7 @@
 	tag = false
 [pull]
 	rebase = true
+[rebase]
+	autoStash = true
+[init]
+	defaultBranch = master

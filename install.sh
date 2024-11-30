@@ -25,3 +25,6 @@ echo ".zshrc copied!"
 ln -s $HOME/.dotfiles/zsh/edouard-custom.zsh-theme $HOME/.oh-my-zsh/themes/
 ln -s $HOME/.dotfiles/zsh/edouard-root.zsh-theme $HOME/.oh-my-zsh/themes/
 echo "zsh-themes copied!"
+ln -s $HOME/.dotfiles/nvim $HOME/.config/nvim
+echo "Nvim config copied!"
+

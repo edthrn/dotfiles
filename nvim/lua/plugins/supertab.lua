@@ -28,7 +28,7 @@ return {
       end, { "i", "s" }),
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
-          cmp.select_prev_item()
+          cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
         elseif vim.snippet.active({ direction = -1 }) then
           vim.schedule(function()
             vim.snippet.jump(-1)
@@ -39,20 +39,15 @@ return {
       end, { "i", "s" }),
     })
 
-    -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
+   -- Disabling autocomplete all the time
+   -- Suggestions are enabled after pressing "TAB" (see above 'cmp.complete()')
     cmp.setup({
-      enabled = function()
-        -- disable completion in comments
-        local context = require("cmp.config.context")
-        -- keep command mode completion enabled when cursor is in a comment
-        if vim.api.nvim_get_mode().mode == "c" then
-          return true
-        else
-          return not context.in_treesitter_capture("comment") and not context.in_syntax_group("Comment")
-        end
-      end,
+      completion = { autocomplete = false }
     })
-  
+
+    -- Ghost text is very annoying and mess up with my understanding
+    -- of what is the current cursor position, and what is the actual
+    -- current content of the line 
     opts.experimental = vim.tbl_extend("force", opts.experimental, {
       ghost_text = false,
     })

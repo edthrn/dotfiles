@@ -1,0 +1,12 @@
+[general]
+import = [
+  "~/.config/alacritty/dracula.toml",
+]
+
+[keyboard]
+bindings = [
+  { key = "F11",  action = "ToggleFullScreen" }
+]
+
+[font]
+offset.y = 2

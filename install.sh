@@ -27,4 +27,5 @@ ln -s $HOME/.dotfiles/zsh/edouard-root.zsh-theme $HOME/.oh-my-zsh/themes/
 echo "zsh-themes copied!"
 ln -s $HOME/.dotfiles/nvim $HOME/.config/nvim
 echo "Nvim config copied!"
-
+ln -s $HOME/.dotfiles/alacritty $HOME/.config/alacritty
+echo "Alacritty config copied!"

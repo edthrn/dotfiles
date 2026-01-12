@@ -188,21 +188,48 @@ if ask_yes_no "Install Zsh configuration?"; then
         echo -e "${INFO}zsh-completions plugin already installed${RESET}"
     fi
 
-    # Verify standard plugins exist
-    echo -e "${INFO}Verifying Oh-My-Zsh standard plugins...${RESET}"
+    # Install additional plugins that may not be in older Oh-My-Zsh versions
+    # These plugins exist in the Oh-My-Zsh repo but may be missing in older installations
+
+    # Check and update Oh-My-Zsh if plugins are missing
+    local plugins_to_check=(aws kubectl django go)
     local missing_plugins=()
-    for plugin in aws kubectl django go; do
+
+    for plugin in "${plugins_to_check[@]}"; do
         if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
             missing_plugins+=("$plugin")
         fi
     done
 
-    if [ ${#missing_plugins[@]} -eq 0 ]; then
-        echo -e "${SUCCESS}All standard plugins (aws, kubectl, django, go) are available!${RESET}"
+    if [ ${#missing_plugins[@]} -gt 0 ]; then
+        echo -e "${WARN}Missing Oh-My-Zsh plugins: ${missing_plugins[*]}${RESET}"
+        if ask_yes_no "Do you want to update Oh-My-Zsh to get the latest plugins?"; then
+            echo -e "${INFO}Updating Oh-My-Zsh...${RESET}"
+            if (cd "$HOME/.oh-my-zsh" && git pull); then
+                echo -e "${SUCCESS}Oh-My-Zsh updated!${RESET}"
+
+                # Re-check which plugins are still missing
+                local still_missing=()
+                for plugin in "${missing_plugins[@]}"; do
+                    if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
+                        still_missing+=("$plugin")
+                    fi
+                done
+
+                if [ ${#still_missing[@]} -eq 0 ]; then
+                    echo -e "${SUCCESS}All plugins now available!${RESET}"
+                else
+                    echo -e "${WARN}Still missing: ${still_missing[*]}${RESET}"
+                    echo -e "${INFO}These plugins may not be in your Oh-My-Zsh version.${RESET}"
+                fi
+            else
+                echo -e "${ERROR}Failed to update Oh-My-Zsh${RESET}"
+            fi
+        else
+            echo -e "${INFO}Skipping Oh-My-Zsh update. The .zshrc will only load available plugins.${RESET}"
+        fi
     else
-        echo -e "${WARN}Missing standard plugins: ${missing_plugins[*]}${RESET}"
-        echo -e "${INFO}These should be included with Oh-My-Zsh. Consider updating Oh-My-Zsh:${RESET}"
-        echo "  cd ~/.oh-my-zsh && git pull"
+        echo -e "${SUCCESS}All Oh-My-Zsh plugins (aws, kubectl, django, go) are available!${RESET}"
     fi
 fi
 

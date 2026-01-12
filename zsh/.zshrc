@@ -12,11 +12,14 @@ fi
 
 export ZSH=$HOME/.oh-my-zsh
 
-# Use Dracula theme if available, otherwise fall back to custom theme
-if [ -f "$ZSH/themes/dracula.zsh-theme" ]; then
+# Use custom theme with Dracula colors
+# Falls back to standalone Dracula theme if custom theme is not available
+if [ -f "$ZSH/themes/edouard-custom.zsh-theme" ]; then
+    ZSH_THEME="edouard-custom"
+elif [ -f "$ZSH/themes/dracula.zsh-theme" ]; then
     ZSH_THEME="dracula"
 else
-    ZSH_THEME="edouard-custom"
+    ZSH_THEME="robbyrussell"  # Default Oh-My-Zsh theme
 fi
 
 # Only include plugins that are available in Oh-My-Zsh

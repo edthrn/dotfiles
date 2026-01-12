@@ -1,7 +1,10 @@
+# Dracula-themed custom prompt
+# Uses Dracula color palette: https://draculatheme.com/
+
 # prompt turns red if the previous command didn't exit with 0
 local arrow="%(?:%{$fg_bold[green]%}>:%{$fg_bold[red]%}>)"
 # local conda_env="%(%{$CONDA_PROMPT_MODIFIER%})"
-PROMPT='%{$fg[green]%}%n@%m %{$fg[cyan]%}$(get_pwd) $(git_prompt_info)
+PROMPT='%{$fg[cyan]%}%n@%m %{$fg[magenta]%}$(get_pwd) $(git_prompt_info)
  %{$fg_bold[{$COLOR}]%}${arrow}%{$reset_color%} '
 
 # Replace home by ~

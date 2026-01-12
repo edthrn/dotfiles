@@ -132,19 +132,104 @@ fi
 # Zsh configuration
 if ask_yes_no "Install Zsh configuration?"; then
     echo -e "\n${INFO}Installing Zsh configuration...${RESET}"
-    safe_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc" "Zsh config"
 
     # Check if Oh-My-Zsh is installed
-    if [ -d "$HOME/.oh-my-zsh/themes" ]; then
-        if [ -f "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" ]; then
-            safe_symlink "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-custom.zsh-theme" "Zsh custom theme"
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        echo -e "${WARN}Oh-My-Zsh not found.${RESET}"
+        if ask_yes_no "Do you want to install Oh-My-Zsh now?"; then
+            echo -e "${INFO}Installing Oh-My-Zsh...${RESET}"
+            RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || {
+                echo -e "${ERROR}Failed to install Oh-My-Zsh${RESET}"
+                echo -e "${WARN}Skipping Zsh configuration.${RESET}"
+                continue
+            }
+            echo -e "${SUCCESS}Oh-My-Zsh installed!${RESET}"
+        else
+            echo -e "${WARN}Skipping Zsh configuration. Install Oh-My-Zsh first: https://ohmyz.sh/${RESET}"
+            continue
         fi
-        if [ -f "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" ]; then
-            safe_symlink "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-root.zsh-theme" "Zsh root theme"
+    fi
+
+    # Install .zshrc
+    safe_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc" "Zsh config"
+
+    # Install custom themes
+    if [ -f "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" ]; then
+        safe_symlink "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-custom.zsh-theme" "Zsh custom theme"
+    fi
+    if [ -f "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" ]; then
+        safe_symlink "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-root.zsh-theme" "Zsh root theme"
+    fi
+
+    # Install Dracula theme
+    if [ ! -f "$HOME/.oh-my-zsh/themes/dracula.zsh-theme" ]; then
+        echo -e "${INFO}Installing Dracula theme for Zsh...${RESET}"
+        if curl -fsSL https://raw.githubusercontent.com/dracula/zsh/master/dracula.zsh-theme -o "$HOME/.oh-my-zsh/themes/dracula.zsh-theme"; then
+            echo -e "${SUCCESS}Dracula theme installed!${RESET}"
+        else
+            echo -e "${ERROR}Failed to install Dracula theme${RESET}"
         fi
     else
-        echo -e "${WARN}Oh-My-Zsh not found. Skipping theme installation.${RESET}"
-        echo "Install Oh-My-Zsh first: https://ohmyz.sh/"
+        echo -e "${INFO}Dracula theme already installed${RESET}"
+    fi
+
+    # Ensure custom plugins directory exists
+    mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
+
+    # Install zsh-completions plugin
+    if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" ]; then
+        echo -e "${INFO}Installing zsh-completions plugin...${RESET}"
+        if git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" 2>/dev/null; then
+            echo -e "${SUCCESS}zsh-completions plugin installed!${RESET}"
+        else
+            echo -e "${ERROR}Failed to install zsh-completions plugin${RESET}"
+        fi
+    else
+        echo -e "${INFO}zsh-completions plugin already installed${RESET}"
+    fi
+
+    # Install additional plugins that may not be in older Oh-My-Zsh versions
+    # These plugins exist in the Oh-My-Zsh repo but may be missing in older installations
+
+    # Check and update Oh-My-Zsh if plugins are missing
+    local plugins_to_check=(aws kubectl django go)
+    local missing_plugins=()
+
+    for plugin in "${plugins_to_check[@]}"; do
+        if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
+            missing_plugins+=("$plugin")
+        fi
+    done
+
+    if [ ${#missing_plugins[@]} -gt 0 ]; then
+        echo -e "${WARN}Missing Oh-My-Zsh plugins: ${missing_plugins[*]}${RESET}"
+        if ask_yes_no "Do you want to update Oh-My-Zsh to get the latest plugins?"; then
+            echo -e "${INFO}Updating Oh-My-Zsh...${RESET}"
+            if (cd "$HOME/.oh-my-zsh" && git pull); then
+                echo -e "${SUCCESS}Oh-My-Zsh updated!${RESET}"
+
+                # Re-check which plugins are still missing
+                local still_missing=()
+                for plugin in "${missing_plugins[@]}"; do
+                    if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
+                        still_missing+=("$plugin")
+                    fi
+                done
+
+                if [ ${#still_missing[@]} -eq 0 ]; then
+                    echo -e "${SUCCESS}All plugins now available!${RESET}"
+                else
+                    echo -e "${WARN}Still missing: ${still_missing[*]}${RESET}"
+                    echo -e "${INFO}These plugins may not be in your Oh-My-Zsh version.${RESET}"
+                fi
+            else
+                echo -e "${ERROR}Failed to update Oh-My-Zsh${RESET}"
+            fi
+        else
+            echo -e "${INFO}Skipping Oh-My-Zsh update. The .zshrc will only load available plugins.${RESET}"
+        fi
+    else
+        echo -e "${SUCCESS}All Oh-My-Zsh plugins (aws, kubectl, django, go) are available!${RESET}"
     fi
 fi
 

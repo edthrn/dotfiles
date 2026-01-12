@@ -249,6 +249,14 @@ if ask_yes_no "Install Alacritty configuration?"; then
     safe_symlink "$DOTFILES_DIR/alacritty" "$HOME/.config/alacritty" "Alacritty config"
 fi
 
+# Ghostty configuration
+if ask_yes_no "Install Ghostty configuration?"; then
+    echo -e "\n${INFO}Installing Ghostty configuration...${RESET}"
+    # Ensure .config directory exists
+    mkdir -p "$HOME/.config"
+    safe_symlink "$DOTFILES_DIR/ghostty" "$HOME/.config/ghostty" "Ghostty config"
+fi
+
 # PyCharm configuration
 if ask_yes_no "Install PyCharm configuration?"; then
     echo -e "\n${INFO}Installing PyCharm configuration...${RESET}"

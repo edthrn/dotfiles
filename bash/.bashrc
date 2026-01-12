@@ -116,10 +116,13 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export JAMMIT=/home/edouard/Musique/Jammit-Tracks
+export JAMMIT=$HOME/Musique/Jammit-Tracks
 
-export GOPATH=$HOME/code/drafts/go
-export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+# Go - only add if installed
+if [ -d "/usr/local/go/bin" ]; then
+    export GOPATH=$HOME/code/drafts/go
+    export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+fi
 
-# added by Miniconda3 installer
-export PATH="/home/edouard/miniconda3/bin:$PATH"
+# Miniconda3 - only add if installed
+[ -d "$HOME/miniconda3/bin" ] && export PATH="$HOME/miniconda3/bin:$PATH"

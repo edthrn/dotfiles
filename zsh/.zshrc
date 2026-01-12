@@ -11,11 +11,26 @@ fi
 [ -d "/usr/share/sbt/bin" ] && export PATH="/usr/share/sbt/bin:$PATH"
 
 export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="edouard-custom"
 
-plugins=(git python docker django zsh-navigation-tools zsh-completions aws kubectl go)
+# Use Dracula theme if available, otherwise fall back to custom theme
+if [ -f "$ZSH/themes/dracula.zsh-theme" ]; then
+    ZSH_THEME="dracula"
+else
+    ZSH_THEME="edouard-custom"
+fi
 
-ZSH_THEME="dracula"
+# Only include plugins that are available in Oh-My-Zsh
+# Core plugins that should always be available
+plugins=(git python docker zsh-navigation-tools)
+
+# Add optional plugins if they exist
+[ -d "$ZSH/plugins/aws" ] && plugins+=(aws)
+[ -d "$ZSH/plugins/kubectl" ] && plugins+=(kubectl)
+[ -d "$ZSH/plugins/django" ] && plugins+=(django)
+[ -d "$ZSH/plugins/go" ] && plugins+=(go)
+
+# zsh-completions requires manual installation
+[ -d "$ZSH/custom/plugins/zsh-completions" ] && plugins+=(zsh-completions)
 
 # Don't save in history commands that starts by space
 # https://superuser.com/a/352858

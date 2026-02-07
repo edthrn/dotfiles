@@ -2,6 +2,7 @@ shell-integration = zsh
 shell-integration-features = cursor,sudo,title
 command = /bin/zsh --login
 keybind = f11=toggle_fullscreen
+font-size = 16
 
 # Dracula Theme
 background = 282a36

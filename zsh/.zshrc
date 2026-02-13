@@ -54,5 +54,6 @@ alias clj='rlwrap clj'
 export GH_PAGER=""
 
 if [[ -n "$TOOLBOX_PATH" ]]; then
-    PROMPT="⬢ $PROMPT"
+    PROMPT='%{$fg[magenta]%}⬢[%{$fg[cyan]%}%n@%m %{$fg[magenta]%}$(get_pwd)%{$fg[magenta]%}] $(git_prompt_info)
+ %(?:%{$fg_bold[green]%}\$:%{$fg_bold[red]%}\$)%{$reset_color%} '
 fi

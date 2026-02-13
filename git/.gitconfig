@@ -8,6 +8,7 @@
 	editor = vim
 [push]
 	default = simple
+	autoSetupRemote = true
 [merge]
 	ff = false
 [alias]

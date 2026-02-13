@@ -49,3 +49,10 @@ alias vbox='VBoxManage'
 alias clojure='rlwrap clojure'
 alias clj='rlwrap clj'
 
+
+. "$HOME/.local/bin/env"
+export GH_PAGER=""
+
+if [[ -n "$TOOLBOX_PATH" ]]; then
+    PROMPT="⬢ $PROMPT"
+fi

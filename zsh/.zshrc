@@ -59,3 +59,6 @@ if [[ -n "$TOOLBOX_PATH" ]]; then
     PROMPT='%{$fg[magenta]%}⬢ %{$fg[white]%}[%n@%m %{$fg[blue]%}$(get_pwd)%{$fg[white]%}] $(git_prompt_info)
  %(?:%{$fg_bold[green]%}\$:%{$fg_bold[red]%}\$)%{$reset_color%} '
 fi
+
+# Directory where hugging face will store downloaded models
+export HF_HOME=$HOME/ai-models/hf

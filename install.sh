@@ -257,6 +257,14 @@ if ask_yes_no "Install Ghostty configuration?"; then
     safe_symlink "$DOTFILES_DIR/ghostty" "$HOME/.config/ghostty" "Ghostty config"
 fi
 
+# VSCode configuration
+if ask_yes_no "Install VSCode configuration?"; then
+    echo -e "\n${INFO}Installing VSCode configuration...${RESET}"
+    # Ensure Code/User directory exists
+    mkdir -p "$HOME/.config/Code/User"
+    safe_symlink "$DOTFILES_DIR/vscode/settings.json" "$HOME/.config/Code/User/settings.json" "VSCode settings"
+fi
+
 # PyCharm configuration
 if ask_yes_no "Install PyCharm configuration?"; then
     echo -e "\n${INFO}Installing PyCharm configuration...${RESET}"

@@ -56,6 +56,6 @@ export GH_PAGER=""
 if [[ -n "$TOOLBOX_PATH" ]]; then
     ZSH_THEME_GIT_PROMPT_PREFIX="%{$reset_color%}(⎇ "
     ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%})"
-    PROMPT='%{$fg[magenta]%}⬢[%{$fg[cyan]%}%n@%m %{$fg[magenta]%}$(get_pwd)%{$fg[magenta]%}] $(git_prompt_info)
+    PROMPT='%{$fg[magenta]%}⬢ %{$fg[white]%}[%n@%m %{$fg[blue]%}$(get_pwd)%{$fg[white]%}] $(git_prompt_info)
  %(?:%{$fg_bold[green]%}\$:%{$fg_bold[red]%}\$)%{$reset_color%} '
 fi

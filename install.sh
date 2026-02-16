@@ -11,20 +11,6 @@ RESET='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$SCRIPT_DIR"
 
-# Helper function to ask yes/no questions
-ask_yes_no() {
-    local prompt="$1"
-    local response
-    while true; do
-        read -p "$prompt (y/n): " response
-        case "$response" in
-            [Yy]* ) return 0 ;;
-            [Nn]* ) return 1 ;;
-            * ) echo "Please answer y or n." ;;
-        esac
-    done
-}
-
 # Helper function to check if a symlink exists and points to the expected target
 is_installed() {
     local link_path="$1"
@@ -42,6 +28,20 @@ is_installed() {
     else
         return 1  # Does not exist
     fi
+}
+
+# Helper function to ask yes/no questions
+ask_yes_no() {
+    local prompt="$1"
+    local response
+    while true; do
+        read -p "$prompt (y/n): " response
+        case "$response" in
+            [Yy]* ) return 0 ;;
+            [Nn]* ) return 1 ;;
+            * ) echo "Please answer y or n." ;;
+        esac
+    done
 }
 
 # Helper function to safely create a symlink
@@ -89,17 +89,96 @@ safe_symlink() {
     fi
 }
 
+# Available configurations
+CONFIG_NAMES=(
+    "Git"
+    "Bash"
+    "Vim"
+    "Tmux"
+    "Zsh"
+    "Neovim"
+    "Alacritty"
+    "Ghostty"
+    "VSCode"
+    "PyCharm"
+)
+CONFIG_COUNT=${#CONFIG_NAMES[@]}
+
+# Track selected configs (0 = not selected, 1 = selected)
+declare -a CONFIG_SELECTED
+for ((i = 0; i < CONFIG_COUNT; i++)); do
+    CONFIG_SELECTED[$i]=0
+done
+
+# Display the selection menu
+show_menu() {
+    echo ""
+    echo "Which configs do you want to install?"
+    echo ""
+    for ((i = 0; i < CONFIG_COUNT; i++)); do
+        local num=$((i + 1))
+        if [ "${CONFIG_SELECTED[$i]}" -eq 1 ]; then
+            printf "  %2d) ● %s\n" "$num" "${CONFIG_NAMES[$i]}"
+        else
+            printf "  %2d)   %s\n" "$num" "${CONFIG_NAMES[$i]}"
+        fi
+    done
+    echo ""
+    echo "Enter a number to toggle selection, or press Enter to proceed."
+}
+
+# Interactive selection loop
+while true; do
+    show_menu
+    read -p "> " choice
+
+    # Empty input = done selecting
+    if [ -z "$choice" ]; then
+        break
+    fi
+
+    # Validate input is a number in range
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "$CONFIG_COUNT" ]; then
+        local_idx=$((choice - 1))
+        if [ "${CONFIG_SELECTED[$local_idx]}" -eq 0 ]; then
+            CONFIG_SELECTED[$local_idx]=1
+        else
+            CONFIG_SELECTED[$local_idx]=0
+        fi
+    else
+        echo -e "${ERROR}Invalid choice. Enter a number between 1 and $CONFIG_COUNT.${RESET}"
+    fi
+done
+
+# Check if anything was selected
+selected_count=0
+for ((i = 0; i < CONFIG_COUNT; i++)); do
+    if [ "${CONFIG_SELECTED[$i]}" -eq 1 ]; then
+        selected_count=$((selected_count + 1))
+    fi
+done
+
+if [ "$selected_count" -eq 0 ]; then
+    echo -e "${WARN}No configurations selected. Nothing to install.${RESET}"
+    exit 0
+fi
+
+# Show summary of what will be installed
 echo ""
 echo "========================================="
-echo "  Dotfiles Interactive Installation"
+echo "  Dotfiles Installation"
 echo "========================================="
 echo ""
-echo "This script will help you install your dotfiles."
-echo "You can choose which components to install."
+echo "Installing:"
+for ((i = 0; i < CONFIG_COUNT; i++)); do
+    if [ "${CONFIG_SELECTED[$i]}" -eq 1 ]; then
+        echo "  ● ${CONFIG_NAMES[$i]}"
+    fi
+done
 echo ""
 
-# Git configuration
-if ask_yes_no "Install Git configuration?"; then
+# 1) Git configuration
+if [ "${CONFIG_SELECTED[0]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Git configuration...${RESET}"
     safe_symlink "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig" "Git config"
     safe_symlink "$DOTFILES_DIR/git/.gitignore_global" "$HOME/.gitignore_global" "Git ignore global"
@@ -108,14 +187,14 @@ if ask_yes_no "Install Git configuration?"; then
     fi
 fi
 
-# Bash configuration
-if ask_yes_no "Install Bash configuration?"; then
+# 2) Bash configuration
+if [ "${CONFIG_SELECTED[1]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Bash configuration...${RESET}"
     safe_symlink "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc" "Bash config"
 fi
 
-# Vim configuration
-if ask_yes_no "Install Vim configuration?"; then
+# 3) Vim configuration
+if [ "${CONFIG_SELECTED[2]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Vim configuration...${RESET}"
     if [ -d "$DOTFILES_DIR/vim/.vim" ]; then
         safe_symlink "$DOTFILES_DIR/vim/.vim" "$HOME/.vim" "Vim directory"
@@ -123,14 +202,14 @@ if ask_yes_no "Install Vim configuration?"; then
     safe_symlink "$DOTFILES_DIR/vim/.vimrc" "$HOME/.vimrc" "Vim config"
 fi
 
-# Tmux configuration
-if ask_yes_no "Install Tmux configuration?"; then
+# 4) Tmux configuration
+if [ "${CONFIG_SELECTED[3]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Tmux configuration...${RESET}"
     safe_symlink "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf" "Tmux config"
 fi
 
-# Zsh configuration
-if ask_yes_no "Install Zsh configuration?"; then
+# 5) Zsh configuration
+if [ "${CONFIG_SELECTED[4]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Zsh configuration...${RESET}"
 
     # Check if Oh-My-Zsh is installed
@@ -141,124 +220,125 @@ if ask_yes_no "Install Zsh configuration?"; then
             RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || {
                 echo -e "${ERROR}Failed to install Oh-My-Zsh${RESET}"
                 echo -e "${WARN}Skipping Zsh configuration.${RESET}"
-                continue
             }
             echo -e "${SUCCESS}Oh-My-Zsh installed!${RESET}"
         else
             echo -e "${WARN}Skipping Zsh configuration. Install Oh-My-Zsh first: https://ohmyz.sh/${RESET}"
-            continue
         fi
     fi
 
-    # Install .zshrc
-    safe_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc" "Zsh config"
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+        # Install .zshrc
+        safe_symlink "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc" "Zsh config"
 
-    # Install custom themes
-    if [ -f "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" ]; then
-        safe_symlink "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-custom.zsh-theme" "Zsh custom theme"
-    fi
-    if [ -f "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" ]; then
-        safe_symlink "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-root.zsh-theme" "Zsh root theme"
-    fi
-
-    # Install Dracula theme
-    if [ ! -f "$HOME/.oh-my-zsh/themes/dracula.zsh-theme" ]; then
-        echo -e "${INFO}Installing Dracula theme for Zsh...${RESET}"
-        if curl -fsSL https://raw.githubusercontent.com/dracula/zsh/master/dracula.zsh-theme -o "$HOME/.oh-my-zsh/themes/dracula.zsh-theme"; then
-            echo -e "${SUCCESS}Dracula theme installed!${RESET}"
-        else
-            echo -e "${ERROR}Failed to install Dracula theme${RESET}"
+        # Install custom themes
+        if [ -f "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" ]; then
+            safe_symlink "$DOTFILES_DIR/zsh/edouard-custom.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-custom.zsh-theme" "Zsh custom theme"
         fi
-    else
-        echo -e "${INFO}Dracula theme already installed${RESET}"
-    fi
-
-    # Ensure custom plugins directory exists
-    mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
-
-    # Install zsh-completions plugin
-    if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" ]; then
-        echo -e "${INFO}Installing zsh-completions plugin...${RESET}"
-        if git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" 2>/dev/null; then
-            echo -e "${SUCCESS}zsh-completions plugin installed!${RESET}"
-        else
-            echo -e "${ERROR}Failed to install zsh-completions plugin${RESET}"
+        if [ -f "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" ]; then
+            safe_symlink "$DOTFILES_DIR/zsh/edouard-root.zsh-theme" "$HOME/.oh-my-zsh/themes/edouard-root.zsh-theme" "Zsh root theme"
         fi
-    else
-        echo -e "${INFO}zsh-completions plugin already installed${RESET}"
-    fi
 
-    # Install additional plugins that may not be in older Oh-My-Zsh versions
-    # These plugins exist in the Oh-My-Zsh repo but may be missing in older installations
-
-    # Check and update Oh-My-Zsh if plugins are missing
-    local plugins_to_check=(aws kubectl django go)
-    local missing_plugins=()
-
-    for plugin in "${plugins_to_check[@]}"; do
-        if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
-            missing_plugins+=("$plugin")
-        fi
-    done
-
-    if [ ${#missing_plugins[@]} -gt 0 ]; then
-        echo -e "${WARN}Missing Oh-My-Zsh plugins: ${missing_plugins[*]}${RESET}"
-        if ask_yes_no "Do you want to update Oh-My-Zsh to get the latest plugins?"; then
-            echo -e "${INFO}Updating Oh-My-Zsh...${RESET}"
-            if (cd "$HOME/.oh-my-zsh" && git pull); then
-                echo -e "${SUCCESS}Oh-My-Zsh updated!${RESET}"
-
-                # Re-check which plugins are still missing
-                local still_missing=()
-                for plugin in "${missing_plugins[@]}"; do
-                    if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
-                        still_missing+=("$plugin")
-                    fi
-                done
-
-                if [ ${#still_missing[@]} -eq 0 ]; then
-                    echo -e "${SUCCESS}All plugins now available!${RESET}"
-                else
-                    echo -e "${WARN}Still missing: ${still_missing[*]}${RESET}"
-                    echo -e "${INFO}These plugins may not be in your Oh-My-Zsh version.${RESET}"
-                fi
+        # Install Dracula theme
+        if [ ! -f "$HOME/.oh-my-zsh/themes/dracula.zsh-theme" ]; then
+            echo -e "${INFO}Installing Dracula theme for Zsh...${RESET}"
+            if curl -fsSL https://raw.githubusercontent.com/dracula/zsh/master/dracula.zsh-theme -o "$HOME/.oh-my-zsh/themes/dracula.zsh-theme"; then
+                echo -e "${SUCCESS}Dracula theme installed!${RESET}"
             else
-                echo -e "${ERROR}Failed to update Oh-My-Zsh${RESET}"
+                echo -e "${ERROR}Failed to install Dracula theme${RESET}"
             fi
         else
-            echo -e "${INFO}Skipping Oh-My-Zsh update. The .zshrc will only load available plugins.${RESET}"
+            echo -e "${INFO}Dracula theme already installed${RESET}"
         fi
-    else
-        echo -e "${SUCCESS}All Oh-My-Zsh plugins (aws, kubectl, django, go) are available!${RESET}"
+
+        # Ensure custom plugins directory exists
+        mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
+
+        # Install zsh-completions plugin
+        if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" ]; then
+            echo -e "${INFO}Installing zsh-completions plugin...${RESET}"
+            if git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions" 2>/dev/null; then
+                echo -e "${SUCCESS}zsh-completions plugin installed!${RESET}"
+            else
+                echo -e "${ERROR}Failed to install zsh-completions plugin${RESET}"
+            fi
+        else
+            echo -e "${INFO}zsh-completions plugin already installed${RESET}"
+        fi
+
+        # Check and update Oh-My-Zsh if plugins are missing
+        plugins_to_check=(aws kubectl django go)
+        missing_plugins=()
+
+        for plugin in "${plugins_to_check[@]}"; do
+            if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
+                missing_plugins+=("$plugin")
+            fi
+        done
+
+        if [ ${#missing_plugins[@]} -gt 0 ]; then
+            echo -e "${WARN}Missing Oh-My-Zsh plugins: ${missing_plugins[*]}${RESET}"
+            if ask_yes_no "Do you want to update Oh-My-Zsh to get the latest plugins?"; then
+                echo -e "${INFO}Updating Oh-My-Zsh...${RESET}"
+                if (cd "$HOME/.oh-my-zsh" && git pull); then
+                    echo -e "${SUCCESS}Oh-My-Zsh updated!${RESET}"
+
+                    # Re-check which plugins are still missing
+                    still_missing=()
+                    for plugin in "${missing_plugins[@]}"; do
+                        if [ ! -d "$HOME/.oh-my-zsh/plugins/$plugin" ]; then
+                            still_missing+=("$plugin")
+                        fi
+                    done
+
+                    if [ ${#still_missing[@]} -eq 0 ]; then
+                        echo -e "${SUCCESS}All plugins now available!${RESET}"
+                    else
+                        echo -e "${WARN}Still missing: ${still_missing[*]}${RESET}"
+                        echo -e "${INFO}These plugins may not be in your Oh-My-Zsh version.${RESET}"
+                    fi
+                else
+                    echo -e "${ERROR}Failed to update Oh-My-Zsh${RESET}"
+                fi
+            else
+                echo -e "${INFO}Skipping Oh-My-Zsh update. The .zshrc will only load available plugins.${RESET}"
+            fi
+        else
+            echo -e "${SUCCESS}All Oh-My-Zsh plugins (aws, kubectl, django, go) are available!${RESET}"
+        fi
     fi
 fi
 
-# Neovim configuration
-if ask_yes_no "Install Neovim configuration?"; then
+# 6) Neovim configuration
+if [ "${CONFIG_SELECTED[5]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Neovim configuration...${RESET}"
-    # Ensure .config directory exists
     mkdir -p "$HOME/.config"
     safe_symlink "$DOTFILES_DIR/nvim" "$HOME/.config/nvim" "Neovim config"
 fi
 
-# Alacritty configuration
-if ask_yes_no "Install Alacritty configuration?"; then
+# 7) Alacritty configuration
+if [ "${CONFIG_SELECTED[6]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Alacritty configuration...${RESET}"
-    # Ensure .config directory exists
     mkdir -p "$HOME/.config"
     safe_symlink "$DOTFILES_DIR/alacritty" "$HOME/.config/alacritty" "Alacritty config"
 fi
 
-# Ghostty configuration
-if ask_yes_no "Install Ghostty configuration?"; then
+# 8) Ghostty configuration
+if [ "${CONFIG_SELECTED[7]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing Ghostty configuration...${RESET}"
-    # Ensure .config directory exists
     mkdir -p "$HOME/.config"
     safe_symlink "$DOTFILES_DIR/ghostty" "$HOME/.config/ghostty" "Ghostty config"
 fi
 
-# PyCharm configuration
-if ask_yes_no "Install PyCharm configuration?"; then
+# 9) VSCode configuration
+if [ "${CONFIG_SELECTED[8]}" -eq 1 ]; then
+    echo -e "\n${INFO}Installing VSCode configuration...${RESET}"
+    mkdir -p "$HOME/.config/Code/User"
+    safe_symlink "$DOTFILES_DIR/vscode/settings.json" "$HOME/.config/Code/User/settings.json" "VSCode settings"
+fi
+
+# 10) PyCharm configuration
+if [ "${CONFIG_SELECTED[9]}" -eq 1 ]; then
     echo -e "\n${INFO}Installing PyCharm configuration...${RESET}"
     if [ -f "$DOTFILES_DIR/pycharm/pycharm-settings.jar" ]; then
         echo -e "${INFO}PyCharm settings file found: $DOTFILES_DIR/pycharm/pycharm-settings.jar${RESET}"

@@ -1,4 +1,17 @@
 {
+    "editor.minimap.enabled": false,
     "telemetry.telemetryLevel": "off",
-    "workbench.colorTheme": "Aura Dracula Spirit (Soft)",
+    "workbench.startupEditor": "none",
+    "workbench.colorTheme": "Dracula Theme",
+    "workbench.editor.empty.hint": "hidden",
+    "python.analysis.typeCheckingMode": "standard",
+    "files.autoSave": "afterDelay",
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/*.egg-info": true,
+        "*ruff_cache*": true
+    },
+    "terminal.integrated.enableMultiLinePasteWarning": "never",
+    "explorer.confirmDelete": false
 }

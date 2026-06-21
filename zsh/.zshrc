@@ -42,6 +42,9 @@ setopt HIST_IGNORE_SPACE
 # Neovim - only add if installed
 [ -d "/opt/nvim-linux64/bin" ] && export PATH="$PATH:/opt/nvim-linux64/bin"
 
+# vLLM CLI - only add if installed
+[ -x "/srv/vllm/venv/bin/vllm" ] && export PATH="$PATH:/srv/vllm/venv/bin"
+
 alias nv='nvim'
 source $ZSH/oh-my-zsh.sh
 alias sbcl='rlwrap sbcl'
@@ -56,9 +59,21 @@ export GH_PAGER=""
 if [[ -n "$TOOLBOX_PATH" ]]; then
     ZSH_THEME_GIT_PROMPT_PREFIX="%{$reset_color%}(⎇ "
     ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%})"
-    PROMPT='%{$fg[magenta]%}⬢ %{$fg[white]%}[%n@%m %{$fg[blue]%}$(get_pwd)%{$fg[white]%}] $(git_prompt_info)
+    _toolbox_name=$(grep '^name=' /run/.containerenv 2>/dev/null | cut -d'"' -f2)
+    PROMPT='%{$fg[magenta]%}⬢ %{$fg[white]%}[%n@'"$_toolbox_name"' %{$fg[blue]%}$(get_pwd)%{$fg[white]%}] $(git_prompt_info)
  %(?:%{$fg_bold[green]%}\$:%{$fg_bold[red]%}\$)%{$reset_color%} '
 fi
 
 # Directory where hugging face will store downloaded models
 export HF_HOME=$HOME/ai-models/hf
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+alias docker='podman'
+alias hf='uvx hf'
+# Disable WebKit DMABuf renderer — fixes Wayland Protocol Error 71 on WebKitGTK apps (e.g. Tauri)
+export WEBKIT_DISABLE_DMABUF_RENDERER=1
+
+export PATH=$PATH:/usr/local/go/bin

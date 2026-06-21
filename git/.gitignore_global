@@ -1,5 +1,8 @@
+*.db
 local/
-*egg-info*/*
+*egg-info*/
+.claude/*
+.codex
 .ipynb_checkpoints/*
 __pycache__/*
 */.pytest_cache/*
